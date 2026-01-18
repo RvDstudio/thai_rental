@@ -1,0 +1,1 @@
+ALTER TABLE "account" ADD COLUMN "accessTokenExpiresAt" timestamp with time zone;

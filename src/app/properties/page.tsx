@@ -1,0 +1,489 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { MapPin, Bed, Bath, Maximize, Heart, ShoppingCart, ChevronDown, SlidersHorizontal } from "lucide-react";
+import { useWishlist } from "@/contexts/WishlistContext";
+
+interface Rental {
+  id: string;
+  name: string;
+  location: string;
+  beds: number;
+  baths: number;
+  area: number;
+  price: number;
+  type: string;
+  image: string;
+}
+
+const rentals: Rental[] = [
+  {
+    id: "1",
+    name: "Serene Haven Estates",
+    location: "Downtown Metropolis",
+    beds: 3,
+    baths: 2,
+    area: 1648,
+    price: 25000,
+    type: "House",
+    image: "/images/rentals/rental1.jpg",
+  },
+  {
+    id: "2",
+    name: "Ocean View Villa",
+    location: "Pattaya Beach",
+    beds: 4,
+    baths: 3,
+    area: 2200,
+    price: 45000,
+    type: "Villa",
+    image: "/images/rentals/rental2.jpg",
+  },
+  {
+    id: "3",
+    name: "Modern City Condo",
+    location: "Bangkok Central",
+    beds: 2,
+    baths: 1,
+    area: 850,
+    price: 15000,
+    type: "Condo",
+    image: "/images/rentals/rental3.jpg",
+  },
+  {
+    id: "4",
+    name: "Tropical Garden House",
+    location: "Chiang Mai",
+    beds: 3,
+    baths: 2,
+    area: 1800,
+    price: 20000,
+    type: "House",
+    image: "/images/rentals/rental4.jpg",
+  },
+  {
+    id: "5",
+    name: "Luxury Penthouse",
+    location: "Bangkok Central",
+    beds: 4,
+    baths: 3,
+    area: 3000,
+    price: 80000,
+    type: "Condo",
+    image: "/images/rentals/rental1.jpg",
+  },
+  {
+    id: "6",
+    name: "Riverside Retreat",
+    location: "Chiang Mai",
+    beds: 2,
+    baths: 2,
+    area: 1200,
+    price: 18000,
+    type: "House",
+    image: "/images/rentals/rental2.jpg",
+  },
+  {
+    id: "7",
+    name: "Beachfront Bungalow",
+    location: "Pattaya Beach",
+    beds: 1,
+    baths: 1,
+    area: 600,
+    price: 12000,
+    type: "Villa",
+    image: "/images/rentals/rental3.jpg",
+  },
+  {
+    id: "8",
+    name: "Mountain View Estate",
+    location: "Chiang Mai",
+    beds: 5,
+    baths: 4,
+    area: 3500,
+    price: 55000,
+    type: "Villa",
+    image: "/images/rentals/rental4.jpg",
+  },
+  {
+    id: "9",
+    name: "Serene Haven Estates",
+    location: "Downtown Metropolis",
+    beds: 3,
+    baths: 2,
+    area: 1648,
+    price: 25000,
+    type: "House",
+    image: "/images/rentals/rental1.jpg",
+  },
+  {
+    id: "10",
+    name: "Ocean View Villa",
+    location: "Pattaya Beach",
+    beds: 4,
+    baths: 3,
+    area: 2200,
+    price: 45000,
+    type: "Villa",
+    image: "/images/rentals/rental2.jpg",
+  },
+  {
+    id: "11",
+    name: "Modern City Condo",
+    location: "Bangkok Central",
+    beds: 2,
+    baths: 1,
+    area: 850,
+    price: 15000,
+    type: "Condo",
+    image: "/images/rentals/rental3.jpg",
+  },
+  {
+    id: "12",
+    name: "Tropical Garden House",
+    location: "Chiang Mai",
+    beds: 3,
+    baths: 2,
+    area: 1800,
+    price: 20000,
+    type: "House",
+    image: "/images/rentals/rental4.jpg",
+  },
+  {
+    id: "13",
+    name: "Luxury Penthouse",
+    location: "Bangkok Central",
+    beds: 4,
+    baths: 3,
+    area: 3000,
+    price: 80000,
+    type: "Condo",
+    image: "/images/rentals/rental1.jpg",
+  },
+  {
+    id: "14",
+    name: "Riverside Retreat",
+    location: "Chiang Mai",
+    beds: 2,
+    baths: 2,
+    area: 1200,
+    price: 18000,
+    type: "House",
+    image: "/images/rentals/rental2.jpg",
+  },
+  {
+    id: "15",
+    name: "Beachfront Bungalow",
+    location: "Pattaya Beach",
+    beds: 1,
+    baths: 1,
+    area: 600,
+    price: 12000,
+    type: "Villa",
+    image: "/images/rentals/rental3.jpg",
+  },
+  {
+    id: "16",
+    name: "Mountain View Estate",
+    location: "Chiang Mai",
+    beds: 5,
+    baths: 4,
+    area: 3500,
+    price: 55000,
+    type: "Villa",
+    image: "/images/rentals/rental4.jpg",
+  },
+];
+
+const locations = ["All Locations", "Bangkok Central", "Pattaya Beach", "Chiang Mai", "Downtown Metropolis"];
+const propertyTypes = ["All Types", "House", "Condo", "Villa"];
+const bedroomOptions = ["Any Beds", "1+", "2+", "3+", "4+", "5+"];
+const priceRanges = ["Any Price", "Under ฿20,000", "฿20,000 - ฿40,000", "฿40,000 - ฿60,000", "Over ฿60,000"];
+
+export default function PropertiesPage() {
+  const [location, setLocation] = useState("All Locations");
+  const [propertyType, setPropertyType] = useState("All Types");
+  const [bedrooms, setBedrooms] = useState("Any Beds");
+  const [priceRange, setPriceRange] = useState("Any Price");
+
+  const filteredRentals = rentals.filter((rental) => {
+    // Location filter
+    if (location !== "All Locations" && rental.location !== location) {
+      return false;
+    }
+
+    // Property type filter
+    if (propertyType !== "All Types" && rental.type !== propertyType) {
+      return false;
+    }
+
+    // Bedrooms filter
+    if (bedrooms !== "Any Beds") {
+      const minBeds = parseInt(bedrooms);
+      if (rental.beds < minBeds) {
+        return false;
+      }
+    }
+
+    // Price range filter
+    if (priceRange !== "Any Price") {
+      if (priceRange === "Under ฿20,000" && rental.price >= 20000) return false;
+      if (priceRange === "฿20,000 - ฿40,000" && (rental.price < 20000 || rental.price > 40000)) return false;
+      if (priceRange === "฿40,000 - ฿60,000" && (rental.price < 40000 || rental.price > 60000)) return false;
+      if (priceRange === "Over ฿60,000" && rental.price <= 60000) return false;
+    }
+
+    return true;
+  });
+
+  const clearFilters = () => {
+    setLocation("All Locations");
+    setPropertyType("All Types");
+    setBedrooms("Any Beds");
+    setPriceRange("Any Price");
+  };
+
+  const hasActiveFilters =
+    location !== "All Locations" ||
+    propertyType !== "All Types" ||
+    bedrooms !== "Any Beds" ||
+    priceRange !== "Any Price";
+
+  return (
+    <div className="container mx-auto px-6 md:px-0 py-8">
+      {/* Page Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-[#122B45] mb-2">
+          Available <span className="text-[#9FC3E9]">Properties</span>
+        </h1>
+        <p className="text-gray-500">Find your perfect rental property</p>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-8">
+        <div className="flex items-center gap-2 mb-4">
+          <SlidersHorizontal size={20} className="text-gray-500" />
+          <span className="font-medium text-gray-700">Filters</span>
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="ml-auto text-sm text-blue-600 hover:text-blue-700"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <FilterDropdown
+            label="Location"
+            value={location}
+            options={locations}
+            onChange={setLocation}
+          />
+          <FilterDropdown
+            label="Property Type"
+            value={propertyType}
+            options={propertyTypes}
+            onChange={setPropertyType}
+          />
+          <FilterDropdown
+            label="Bedrooms"
+            value={bedrooms}
+            options={bedroomOptions}
+            onChange={setBedrooms}
+          />
+          <FilterDropdown
+            label="Price Range"
+            value={priceRange}
+            options={priceRanges}
+            onChange={setPriceRange}
+          />
+        </div>
+      </div>
+
+      {/* Results Count */}
+      <div className="mb-6">
+        <p className="text-gray-600">
+          Showing <span className="font-semibold text-gray-900">{filteredRentals.length}</span> properties
+        </p>
+      </div>
+
+      {/* Rental Grid */}
+      {filteredRentals.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {filteredRentals.map((rental) => (
+            <RentalCard key={rental.id} rental={rental} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-16">
+          <p className="text-gray-500 text-lg">No properties found matching your filters.</p>
+          <button
+            onClick={clearFilters}
+            className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
+          >
+            Clear filters
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface FilterDropdownProps {
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (value: string) => void;
+}
+
+function FilterDropdown({ label, value, options, onChange }: FilterDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <label className="block text-xs text-gray-500 mb-1">{label}</label>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors text-left"
+      >
+        <span className="text-gray-700 truncate">{value}</span>
+        <ChevronDown
+          size={16}
+          className={`text-gray-400 transition-transform shrink-0 ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {isOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-10"
+            onClick={() => setIsOpen(false)}
+          />
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 max-h-60 overflow-auto">
+            {options.map((option) => (
+              <button
+                key={option}
+                onClick={() => {
+                  onChange(option);
+                  setIsOpen(false);
+                }}
+                className={`w-full px-4 py-2.5 text-left hover:bg-gray-50 transition-colors ${
+                  value === option ? "bg-blue-50 text-blue-600" : "text-gray-700"
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function RentalCard({ rental }: { rental: Rental }) {
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const isWishlisted = isInWishlist(rental.id);
+
+  return (
+    <div className="group">
+      {/* Image Container */}
+      <Link
+        href={`/properties/${rental.id}`}
+        className="relative aspect-square mb-4 rounded-2xl overflow-hidden bg-linear-to-b from-sky-100 to-sky-50 block cursor-pointer"
+      >
+        <Image
+          src={rental.image}
+          alt={rental.name}
+          fill
+          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+        />
+
+        {/* Property Type Badge */}
+        <div className="absolute top-3 left-3">
+          <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-gray-700">
+            {rental.type}
+          </span>
+        </div>
+
+        {/* Hover Icons */}
+        <div
+          className={`absolute top-3 right-3 flex flex-col gap-2 transition-opacity duration-300 ${
+            isWishlisted ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          }`}
+          onClick={(e) => e.preventDefault()}
+        >
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleWishlist(rental);
+            }}
+            className={`p-2 rounded-full shadow-md transition-colors ${
+              isWishlisted
+                ? "bg-red-50 text-red-500"
+                : "bg-white hover:bg-red-50 hover:text-red-500"
+            }`}
+            aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          >
+            <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} />
+          </button>
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            className="p-2 bg-white rounded-full shadow-md hover:bg-blue-50 hover:text-blue-500 transition-colors"
+            aria-label="Add to cart"
+          >
+            <ShoppingCart size={18} />
+          </button>
+        </div>
+
+        {/* Price Badge */}
+        <div className="absolute bottom-3 left-3">
+          <span className="px-3 py-1.5 bg-[#122B45] text-white rounded-lg text-sm font-semibold">
+            ฿{rental.price.toLocaleString()}/mo
+          </span>
+        </div>
+      </Link>
+
+      {/* Content */}
+      <Link href={`/properties/${rental.id}`} className="block space-y-2">
+        {/* Title and View More */}
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-gray-900 truncate">{rental.name}</h3>
+          <span className="text-sm text-blue-600 hover:text-blue-700 hover:underline shrink-0 ml-2">
+            View More
+          </span>
+        </div>
+
+        {/* Location */}
+        <div className="flex items-center gap-1 text-gray-500 text-sm">
+          <MapPin size={14} />
+          <span>{rental.location}</span>
+        </div>
+
+        {/* Stats */}
+        <div className="flex items-center gap-4 text-gray-600 text-sm">
+          <div className="flex items-center gap-1">
+            <Bed size={16} />
+            <span>{rental.beds}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Bath size={16} />
+            <span>{rental.baths}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Maximize size={16} />
+            <span>{rental.area.toLocaleString()} ft²</span>
+          </div>
+        </div>
+      </Link>
+    </div>
+  );
+}
