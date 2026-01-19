@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signUp } from "@/lib/auth-client";
+import { signUp, signIn } from "@/lib/auth-client";
 // Google icon SVG component
 const GoogleIcon = ({ size = 20 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -76,7 +76,7 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
-      await signUp.social({
+      await signIn.social({
         provider: "google",
         callbackURL: "/",
       });

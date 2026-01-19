@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { Header } from "@/components/Header";
 import { Providers } from "@/components/Providers";
 import "./globals.css";
 
@@ -63,10 +62,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
-          <Header />
-          <main className="pt-20">
-            {children}
-          </main>
+          {children}
         </Providers>
       </body>
     </html>

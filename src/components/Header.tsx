@@ -65,7 +65,7 @@ export function Header() {
         </Link>
 
         {session?.user ? (
-          <UserDropdown user={session.user} />
+          <UserDropdown user={session.user as { name: string; email: string; image?: string | null; role?: string }} />
         ) : (
           <Link
             href="/sign-in"

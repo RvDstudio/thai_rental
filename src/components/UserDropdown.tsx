@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { signOut } from "@/lib/auth-client";
-import { LogOut, User, Settings, ChevronDown } from "lucide-react";
+import { LogOut, User, Settings, ChevronDown, Shield } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -11,6 +11,7 @@ interface UserDropdownProps {
     name: string;
     email: string;
     image?: string | null;
+    role?: string;
   };
 }
 
@@ -82,6 +83,16 @@ export function UserDropdown({ user }: UserDropdownProps) {
 
           {/* Menu items */}
           <div className="py-1">
+            {user.role === "admin" && (
+              <Link
+                href="/admin"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 px-4 py-2 text-purple-600 hover:bg-purple-50 transition-colors"
+              >
+                <Shield size={18} />
+                <span>Admin Dashboard</span>
+              </Link>
+            )}
             <Link
               href="/account"
               onClick={() => setIsOpen(false)}
