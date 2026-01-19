@@ -207,6 +207,7 @@ export default function PropertiesPage() {
   const [propertyType, setPropertyType] = useState("All Types");
   const [bedrooms, setBedrooms] = useState("Any Beds");
   const [priceRange, setPriceRange] = useState("Any Price");
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const filteredRentals = rentals.filter((rental) => {
     // Location filter
@@ -251,64 +252,121 @@ export default function PropertiesPage() {
     bedrooms !== "Any Beds" ||
     priceRange !== "Any Price";
 
+  const activeFilterCount = [
+    location !== "All Locations",
+    propertyType !== "All Types",
+    bedrooms !== "Any Beds",
+    priceRange !== "Any Price",
+  ].filter(Boolean).length;
+
   return (
     <div className="container mx-auto px-6 md:px-0 py-8">
-      {/* Page Header */}
+      {/* Page Header with Filters Dropdown */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#122B45] mb-2">
-          Available <span className="text-[#9FC3E9]">Properties</span>
-        </h1>
+        <div className="flex items-center justify-between mb-0">
+          <h1 className="text-3xl font-bold text-[#122B45]">
+            Available <span className="text-[#9FC3E9]">Properties</span>
+          </h1>
+
+          {/* Filters Dropdown */}
+          <div className="flex flex-col items-end">
+            <div className="relative">
+              <button
+                onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+                className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                <SlidersHorizontal size={18} className="text-gray-500" />
+                <span className="font-medium text-gray-700">Filters</span>
+                {activeFilterCount > 0 && (
+                  <span className="flex items-center justify-center w-5 h-5 bg-blue-600 text-white text-xs font-medium rounded-full">
+                    {activeFilterCount}
+                  </span>
+                )}
+                <ChevronDown
+                  size={16}
+                  className={`text-gray-400 transition-transform ${isFiltersOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {isFiltersOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setIsFiltersOpen(false)}
+                  />
+                  <div className="absolute top-full right-0 mt-2 w-72 bg-white border border-gray-200 rounded-xl shadow-lg z-20 p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="font-medium text-gray-700">Filters</span>
+                      {hasActiveFilters && (
+                        <button
+                          onClick={clearFilters}
+                          className="text-sm text-blue-600 hover:text-blue-700"
+                        >
+                          Clear all
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      <FilterDropdown
+                        label="Location"
+                        value={location}
+                        options={locations}
+                        onChange={setLocation}
+                      />
+                      <FilterDropdown
+                        label="Property Type"
+                        value={propertyType}
+                        options={propertyTypes}
+                        onChange={setPropertyType}
+                      />
+                      <FilterDropdown
+                        label="Bedrooms"
+                        value={bedrooms}
+                        options={bedroomOptions}
+                        onChange={setBedrooms}
+                      />
+                      <FilterDropdown
+                        label="Price Range"
+                        value={priceRange}
+                        options={priceRanges}
+                        onChange={setPriceRange}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+          </div>
+        </div>
+
         <p className="text-gray-500">Find your perfect rental property</p>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-8">
-        <div className="flex items-center gap-2 mb-4">
-          <SlidersHorizontal size={20} className="text-gray-500" />
-          <span className="font-medium text-gray-700">Filters</span>
-          {hasActiveFilters && (
-            <button
-              onClick={clearFilters}
-              className="ml-auto text-sm text-blue-600 hover:text-blue-700"
-            >
-              Clear all
-            </button>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <FilterDropdown
-            label="Location"
-            value={location}
-            options={locations}
-            onChange={setLocation}
-          />
-          <FilterDropdown
-            label="Property Type"
-            value={propertyType}
-            options={propertyTypes}
-            onChange={setPropertyType}
-          />
-          <FilterDropdown
-            label="Bedrooms"
-            value={bedrooms}
-            options={bedroomOptions}
-            onChange={setBedrooms}
-          />
-          <FilterDropdown
-            label="Price Range"
-            value={priceRange}
-            options={priceRanges}
-            onChange={setPriceRange}
-          />
-        </div>
-      </div>
-
-      {/* Results Count */}
-      <div className="mb-6">
-        <p className="text-gray-600">
+        <p className="text-gray-600 text-sm mt-1">
           Showing <span className="font-semibold text-gray-900">{filteredRentals.length}</span> properties
         </p>
+      </div>
+
+      {/* Ad Boxes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="bg-[#122B45] rounded-2xl p-6 text-white">
+          <h3 className="text-xl font-bold mb-2">Find Your Dream Home</h3>
+          <p className="text-white/80 text-sm mb-4">
+            Explore our exclusive listings with premium amenities and prime locations.
+          </p>
+          <button className="bg-[#9FC3E9] text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-gray-100 transition-colors">
+            Learn More
+          </button>
+        </div>
+        <div className="bg-[#9FC3E9] rounded-2xl p-6 text-[#122B45]">
+          <h3 className="text-xl font-bold mb-2">Special Offers Available</h3>
+          <p className="text-[#122B45]/80 text-sm mb-4">
+            Get up to 20% off on your first month rent. Limited time offer!
+          </p>
+          <button className="bg-[#122B45] text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-[#1a3d5c] transition-colors">
+            View Deals
+          </button>
+        </div>
       </div>
 
       {/* Rental Grid */}
@@ -371,9 +429,8 @@ function FilterDropdown({ label, value, options, onChange }: FilterDropdownProps
                   onChange(option);
                   setIsOpen(false);
                 }}
-                className={`w-full px-4 py-2.5 text-left hover:bg-gray-50 transition-colors ${
-                  value === option ? "bg-blue-50 text-blue-600" : "text-gray-700"
-                }`}
+                className={`w-full px-4 py-2.5 text-left hover:bg-gray-50 transition-colors ${value === option ? "bg-blue-50 text-blue-600" : "text-gray-700"
+                  }`}
               >
                 {option}
               </button>
@@ -412,9 +469,8 @@ function RentalCard({ rental }: { rental: Rental }) {
 
         {/* Hover Icons */}
         <div
-          className={`absolute top-3 right-3 flex flex-col gap-2 transition-opacity duration-300 ${
-            isWishlisted ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-          }`}
+          className={`absolute top-3 right-3 flex flex-col gap-2 transition-opacity duration-300 ${isWishlisted ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+            }`}
           onClick={(e) => e.preventDefault()}
         >
           <button
@@ -423,11 +479,10 @@ function RentalCard({ rental }: { rental: Rental }) {
               e.stopPropagation();
               toggleWishlist(rental);
             }}
-            className={`p-2 rounded-full shadow-md transition-colors ${
-              isWishlisted
-                ? "bg-red-50 text-red-500"
-                : "bg-white hover:bg-red-50 hover:text-red-500"
-            }`}
+            className={`p-2 rounded-full shadow-md transition-colors ${isWishlisted
+              ? "bg-red-50 text-red-500"
+              : "bg-white hover:bg-red-50 hover:text-red-500"
+              }`}
             aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
           >
             <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} />
