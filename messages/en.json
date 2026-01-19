@@ -1,0 +1,77 @@
+{
+  "common": {
+    "properties": "Properties",
+    "about": "About",
+    "contact": "Contact",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "account": "Account",
+    "wishlist": "Wishlist",
+    "search": "Search",
+    "searchPlaceholder": "Search locations...",
+    "language": "Language",
+    "english": "English",
+    "thai": "ภาษาไทย"
+  },
+  "hero": {
+    "title": "Find Your Perfect Rental in Thailand",
+    "subtitle": "Discover beautiful properties across Thailand for your dream vacation or long-term stay"
+  },
+  "properties": {
+    "title": "Properties",
+    "allProperties": "All Properties",
+    "featured": "Featured",
+    "perMonth": "per month",
+    "perNight": "per night",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "viewDetails": "View Details",
+    "filters": "Filters",
+    "priceRange": "Price Range",
+    "propertyType": "Property Type",
+    "location": "Location",
+    "minPrice": "Min Price",
+    "maxPrice": "Max Price",
+    "applyFilters": "Apply Filters",
+    "clearFilters": "Clear Filters",
+    "noResults": "No properties found matching your criteria",
+    "sortBy": "Sort by",
+    "newest": "Newest",
+    "priceLowHigh": "Price: Low to High",
+    "priceHighLow": "Price: High to Low"
+  },
+  "propertyTypes": {
+    "house": "House",
+    "condo": "Condo",
+    "apartment": "Apartment",
+    "villa": "Villa",
+    "townhouse": "Townhouse"
+  },
+  "auth": {
+    "welcomeBack": "Welcome Back",
+    "createAccount": "Create Account",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Name",
+    "forgotPassword": "Forgot Password?",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?"
+  },
+  "wishlist": {
+    "title": "Your Wishlist",
+    "empty": "Your wishlist is empty",
+    "emptyDescription": "Start adding properties you love to your wishlist",
+    "browseProperties": "Browse Properties"
+  },
+  "about": {
+    "title": "About Us",
+    "description": "We help you find the perfect rental property in Thailand"
+  },
+  "footer": {
+    "copyright": "All rights reserved",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  }
+}

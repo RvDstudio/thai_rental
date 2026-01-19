@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, integer, decimal } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 // Better Auth required tables
@@ -54,6 +54,43 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).defaultNow(),
 });
 
+// Property listings
+export const property = pgTable("property", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  location: text("location").notNull(),
+  address: text("address").notNull(),
+  beds: integer("beds").notNull(),
+  baths: integer("baths").notNull(),
+  area: integer("area").notNull(),
+  price: integer("price").notNull(), // Monthly price in THB
+  type: text("type").notNull(), // 'House' | 'Villa' | 'Condo' | 'Apartment'
+  image: text("image").notNull(),
+  images: text("images").array(),
+  description: text("description"),
+  amenities: text("amenities").array(),
+  isAvailable: boolean("isAvailable").notNull().default(true),
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).notNull().defaultNow(),
+});
+
+// Rental agreements
+export const rental = pgTable("rental", {
+  id: text("id").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  propertyId: text("propertyId")
+    .notNull()
+    .references(() => property.id, { onDelete: "cascade" }),
+  startDate: timestamp("startDate", { mode: "date", withTimezone: true }).notNull(),
+  endDate: timestamp("endDate", { mode: "date", withTimezone: true }).notNull(),
+  monthlyRent: integer("monthlyRent").notNull(),
+  status: text("status").notNull().default("pending"), // 'pending' | 'active' | 'completed' | 'cancelled'
+  createdAt: timestamp("createdAt", { mode: "date", withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { mode: "date", withTimezone: true }).notNull().defaultNow(),
+});
+
 // Export schema object for Better Auth
 export const schema = {
   user,
@@ -66,6 +103,7 @@ export const schema = {
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
+  rentals: many(rental),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -79,5 +117,20 @@ export const accountRelations = relations(account, ({ one }) => ({
   user: one(user, {
     fields: [account.userId],
     references: [user.id],
+  }),
+}));
+
+export const propertyRelations = relations(property, ({ many }) => ({
+  rentals: many(rental),
+}));
+
+export const rentalRelations = relations(rental, ({ one }) => ({
+  user: one(user, {
+    fields: [rental.userId],
+    references: [user.id],
+  }),
+  property: one(property, {
+    fields: [rental.propertyId],
+    references: [property.id],
   }),
 }));

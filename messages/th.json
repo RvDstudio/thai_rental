@@ -1,0 +1,77 @@
+{
+  "common": {
+    "properties": "อสังหาริมทรัพย์",
+    "about": "เกี่ยวกับเรา",
+    "contact": "ติดต่อ",
+    "signIn": "เข้าสู่ระบบ",
+    "signUp": "ลงทะเบียน",
+    "signOut": "ออกจากระบบ",
+    "account": "บัญชี",
+    "wishlist": "รายการโปรด",
+    "search": "ค้นหา",
+    "searchPlaceholder": "ค้นหาสถานที่...",
+    "language": "ภาษา",
+    "english": "English",
+    "thai": "ภาษาไทย"
+  },
+  "hero": {
+    "title": "ค้นหาที่พักเช่าที่สมบูรณ์แบบในประเทศไทย",
+    "subtitle": "ค้นพบอสังหาริมทรัพย์ที่สวยงามทั่วประเทศไทยสำหรับวันหยุดพักผ่อนหรือการพักอาศัยระยะยาว"
+  },
+  "properties": {
+    "title": "อสังหาริมทรัพย์",
+    "allProperties": "อสังหาริมทรัพย์ทั้งหมด",
+    "featured": "แนะนำ",
+    "perMonth": "ต่อเดือน",
+    "perNight": "ต่อคืน",
+    "bedrooms": "ห้องนอน",
+    "bathrooms": "ห้องน้ำ",
+    "viewDetails": "ดูรายละเอียด",
+    "filters": "ตัวกรอง",
+    "priceRange": "ช่วงราคา",
+    "propertyType": "ประเภทอสังหาริมทรัพย์",
+    "location": "สถานที่",
+    "minPrice": "ราคาต่ำสุด",
+    "maxPrice": "ราคาสูงสุด",
+    "applyFilters": "ใช้ตัวกรอง",
+    "clearFilters": "ล้างตัวกรอง",
+    "noResults": "ไม่พบอสังหาริมทรัพย์ที่ตรงกับเงื่อนไขของคุณ",
+    "sortBy": "เรียงตาม",
+    "newest": "ใหม่ล่าสุด",
+    "priceLowHigh": "ราคา: ต่ำไปสูง",
+    "priceHighLow": "ราคา: สูงไปต่ำ"
+  },
+  "propertyTypes": {
+    "house": "บ้าน",
+    "condo": "คอนโด",
+    "apartment": "อพาร์ทเมนต์",
+    "villa": "วิลล่า",
+    "townhouse": "ทาวน์เฮ้าส์"
+  },
+  "auth": {
+    "welcomeBack": "ยินดีต้อนรับกลับ",
+    "createAccount": "สร้างบัญชี",
+    "email": "อีเมล",
+    "password": "รหัสผ่าน",
+    "confirmPassword": "ยืนยันรหัสผ่าน",
+    "name": "ชื่อ",
+    "forgotPassword": "ลืมรหัสผ่าน?",
+    "dontHaveAccount": "ยังไม่มีบัญชี?",
+    "alreadyHaveAccount": "มีบัญชีอยู่แล้ว?"
+  },
+  "wishlist": {
+    "title": "รายการโปรดของคุณ",
+    "empty": "รายการโปรดของคุณว่างเปล่า",
+    "emptyDescription": "เริ่มเพิ่มอสังหาริมทรัพย์ที่คุณชอบในรายการโปรด",
+    "browseProperties": "ดูอสังหาริมทรัพย์"
+  },
+  "about": {
+    "title": "เกี่ยวกับเรา",
+    "description": "เราช่วยคุณค้นหาอสังหาริมทรัพย์เช่าที่สมบูรณ์แบบในประเทศไทย"
+  },
+  "footer": {
+    "copyright": "สงวนลิขสิทธิ์",
+    "privacyPolicy": "นโยบายความเป็นส่วนตัว",
+    "termsOfService": "ข้อกำหนดการใช้งาน"
+  }
+}

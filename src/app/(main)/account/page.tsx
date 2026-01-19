@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,40 +17,28 @@ import {
   Edit3,
   Check,
   X,
-  Trash2,
   Clock,
   Building,
+  Loader2,
 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { useWishlist } from "@/contexts/WishlistContext";
 
 type TabType = "details" | "wishlist" | "rentals";
 
-// Mock rentals data - in a real app this would come from the database
-const mockRentals = [
-  {
-    id: "r1",
-    propertyId: "1",
-    name: "Modern Downtown Condo",
-    location: "Sukhumvit, Bangkok",
-    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800",
-    startDate: "2024-01-15",
-    endDate: "2025-01-14",
-    monthlyRent: 45000,
-    status: "active" as const,
-  },
-  {
-    id: "r2",
-    propertyId: "2",
-    name: "Beachfront Villa",
-    location: "Pattaya, Chonburi",
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800",
-    startDate: "2023-06-01",
-    endDate: "2023-12-31",
-    monthlyRent: 85000,
-    status: "completed" as const,
-  },
-];
+interface RentalData {
+  id: string;
+  propertyId: string;
+  startDate: string;
+  endDate: string;
+  monthlyRent: number;
+  status: string;
+  property: {
+    name: string;
+    location: string;
+    image: string;
+  } | null;
+}
 
 export default function AccountPage() {
   const router = useRouter();
@@ -62,6 +50,31 @@ export default function AccountPage() {
     name: "",
     email: "",
   });
+  const [rentals, setRentals] = useState<RentalData[]>([]);
+  const [rentalsLoading, setRentalsLoading] = useState(true);
+
+  // Fetch rentals when user is authenticated
+  useEffect(() => {
+    async function fetchRentals() {
+      if (!session?.user) return;
+
+      try {
+        const response = await fetch("/api/rentals");
+        if (response.ok) {
+          const data = await response.json();
+          setRentals(data);
+        }
+      } catch (error) {
+        console.error("Error fetching rentals:", error);
+      } finally {
+        setRentalsLoading(false);
+      }
+    }
+
+    if (session?.user) {
+      fetchRentals();
+    }
+  }, [session?.user]);
 
   // Redirect if not logged in
   if (!isPending && !session?.user) {
@@ -80,6 +93,7 @@ export default function AccountPage() {
   }
 
   const user = session?.user;
+  const activeRentals = rentals.filter((r) => r.status === "active");
 
   const handleStartEdit = () => {
     setEditForm({
@@ -102,7 +116,7 @@ export default function AccountPage() {
   const tabs = [
     { id: "details" as const, label: "User Details", icon: User },
     { id: "wishlist" as const, label: "Wishlist", icon: Heart, count: wishlistItems.length },
-    { id: "rentals" as const, label: "My Rentals", icon: Home, count: mockRentals.length },
+    { id: "rentals" as const, label: "My Rentals", icon: Home, count: rentals.length },
   ];
 
   return (
@@ -140,7 +154,7 @@ export default function AccountPage() {
             </span>
             <span className="flex items-center gap-1">
               <Home size={14} className="text-[#122B45]" />
-              {mockRentals.filter((r) => r.status === "active").length} active rentals
+              {activeRentals.length} active rentals
             </span>
           </div>
         </div>
@@ -317,9 +331,13 @@ export default function AccountPage() {
         {/* Rentals Tab */}
         {activeTab === "rentals" && (
           <div>
-            {mockRentals.length > 0 ? (
+            {rentalsLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 size={32} className="animate-spin text-gray-400" />
+              </div>
+            ) : rentals.length > 0 ? (
               <div className="space-y-4">
-                {mockRentals.map((rental) => (
+                {rentals.map((rental) => (
                   <RentalCard key={rental.id} rental={rental} />
                 ))}
               </div>
@@ -433,30 +451,24 @@ function WishlistCard({
 }
 
 // Rental Card Component
-interface Rental {
-  id: string;
-  propertyId: string;
-  name: string;
-  location: string;
-  image: string;
-  startDate: string;
-  endDate: string;
-  monthlyRent: number;
-  status: "active" | "completed" | "pending";
-}
-
-function RentalCard({ rental }: { rental: Rental }) {
-  const statusColors = {
+function RentalCard({ rental }: { rental: RentalData }) {
+  const statusColors: Record<string, string> = {
     active: "bg-green-100 text-green-700",
     completed: "bg-gray-100 text-gray-600",
     pending: "bg-amber-100 text-amber-700",
+    cancelled: "bg-red-100 text-red-700",
   };
 
-  const statusLabels = {
+  const statusLabels: Record<string, string> = {
     active: "Active",
     completed: "Completed",
     pending: "Pending",
+    cancelled: "Cancelled",
   };
+
+  if (!rental.property) {
+    return null;
+  }
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-4 flex gap-4">
@@ -465,8 +477,8 @@ function RentalCard({ rental }: { rental: Rental }) {
         className="relative w-32 h-32 rounded-xl overflow-hidden shrink-0"
       >
         <Image
-          src={rental.image}
-          alt={rental.name}
+          src={rental.property.image}
+          alt={rental.property.name}
           fill
           className="object-cover hover:scale-105 transition-transform duration-300"
         />
@@ -479,17 +491,17 @@ function RentalCard({ rental }: { rental: Rental }) {
               href={`/properties/${rental.propertyId}`}
               className="font-semibold text-gray-900 hover:text-[#122B45] transition-colors"
             >
-              {rental.name}
+              {rental.property.name}
             </Link>
             <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
               <MapPin size={14} />
-              <span>{rental.location}</span>
+              <span>{rental.property.location}</span>
             </div>
           </div>
           <span
-            className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[rental.status]}`}
+            className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[rental.status] || statusColors.pending}`}
           >
-            {statusLabels[rental.status]}
+            {statusLabels[rental.status] || rental.status}
           </span>
         </div>
 

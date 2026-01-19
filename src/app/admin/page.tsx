@@ -1,11 +1,10 @@
 import { db } from "@/db/drizzle";
-import { user } from "@/db/schema";
+import { user, property, rental } from "@/db/schema";
 import { count, desc, eq } from "drizzle-orm";
 import {
   Users,
   Building,
   FileText,
-  TrendingUp,
   UserPlus,
   Activity,
 } from "lucide-react";
@@ -16,6 +15,14 @@ async function getDashboardStats() {
     .select({ count: count() })
     .from(user)
     .where(eq(user.role, "admin"));
+
+  const [propertyCount] = await db.select({ count: count() }).from(property);
+
+  const [totalRentalCount] = await db.select({ count: count() }).from(rental);
+  const [activeRentalCount] = await db
+    .select({ count: count() })
+    .from(rental)
+    .where(eq(rental.status, "active"));
 
   const recentUsers = await db
     .select({
@@ -32,6 +39,9 @@ async function getDashboardStats() {
   return {
     totalUsers: userCount.count,
     totalAdmins: adminCount.count,
+    totalProperties: propertyCount.count,
+    totalRentals: totalRentalCount.count,
+    activeRentals: activeRentalCount.count,
     recentUsers,
   };
 }
@@ -45,28 +55,24 @@ export default async function AdminDashboardPage() {
       value: stats.totalUsers,
       icon: Users,
       color: "bg-blue-500",
-      change: "+12%",
     },
     {
       label: "Admin Users",
       value: stats.totalAdmins,
       icon: UserPlus,
       color: "bg-purple-500",
-      change: null,
     },
     {
       label: "Properties",
-      value: 24,
+      value: stats.totalProperties,
       icon: Building,
       color: "bg-green-500",
-      change: "+5%",
     },
     {
       label: "Active Rentals",
-      value: 18,
+      value: stats.activeRentals,
       icon: FileText,
       color: "bg-amber-500",
-      change: "+8%",
     },
   ];
 
@@ -93,12 +99,6 @@ export default async function AdminDashboardPage() {
               >
                 <stat.icon size={24} className="text-white" />
               </div>
-              {stat.change && (
-                <span className="flex items-center gap-1 text-sm text-green-600 font-medium">
-                  <TrendingUp size={16} />
-                  {stat.change}
-                </span>
-              )}
             </div>
             <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
             <p className="text-gray-500 text-sm mt-1">{stat.label}</p>

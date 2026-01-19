@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Bed, Bath, Maximize, Heart, ShoppingCart, ChevronDown, SlidersHorizontal } from "lucide-react";
+import { MapPin, Bed, Bath, Maximize, Heart, ShoppingCart, ChevronDown, SlidersHorizontal, Loader2 } from "lucide-react";
 import { useWishlist } from "@/contexts/WishlistContext";
 
-interface Rental {
+interface Property {
   id: string;
   name: string;
   location: string;
@@ -18,222 +18,63 @@ interface Rental {
   image: string;
 }
 
-const rentals: Rental[] = [
-  {
-    id: "1",
-    name: "Serene Haven Estates",
-    location: "Downtown Metropolis",
-    beds: 3,
-    baths: 2,
-    area: 1648,
-    price: 25000,
-    type: "House",
-    image: "/images/rentals/rental1.jpg",
-  },
-  {
-    id: "2",
-    name: "Ocean View Villa",
-    location: "Pattaya Beach",
-    beds: 4,
-    baths: 3,
-    area: 2200,
-    price: 45000,
-    type: "Villa",
-    image: "/images/rentals/rental2.jpg",
-  },
-  {
-    id: "3",
-    name: "Modern City Condo",
-    location: "Bangkok Central",
-    beds: 2,
-    baths: 1,
-    area: 850,
-    price: 15000,
-    type: "Condo",
-    image: "/images/rentals/rental3.jpg",
-  },
-  {
-    id: "4",
-    name: "Tropical Garden House",
-    location: "Chiang Mai",
-    beds: 3,
-    baths: 2,
-    area: 1800,
-    price: 20000,
-    type: "House",
-    image: "/images/rentals/rental4.jpg",
-  },
-  {
-    id: "5",
-    name: "Luxury Penthouse",
-    location: "Bangkok Central",
-    beds: 4,
-    baths: 3,
-    area: 3000,
-    price: 80000,
-    type: "Condo",
-    image: "/images/rentals/rental1.jpg",
-  },
-  {
-    id: "6",
-    name: "Riverside Retreat",
-    location: "Chiang Mai",
-    beds: 2,
-    baths: 2,
-    area: 1200,
-    price: 18000,
-    type: "House",
-    image: "/images/rentals/rental2.jpg",
-  },
-  {
-    id: "7",
-    name: "Beachfront Bungalow",
-    location: "Pattaya Beach",
-    beds: 1,
-    baths: 1,
-    area: 600,
-    price: 12000,
-    type: "Villa",
-    image: "/images/rentals/rental3.jpg",
-  },
-  {
-    id: "8",
-    name: "Mountain View Estate",
-    location: "Chiang Mai",
-    beds: 5,
-    baths: 4,
-    area: 3500,
-    price: 55000,
-    type: "Villa",
-    image: "/images/rentals/rental4.jpg",
-  },
-  {
-    id: "9",
-    name: "Serene Haven Estates",
-    location: "Downtown Metropolis",
-    beds: 3,
-    baths: 2,
-    area: 1648,
-    price: 25000,
-    type: "House",
-    image: "/images/rentals/rental1.jpg",
-  },
-  {
-    id: "10",
-    name: "Ocean View Villa",
-    location: "Pattaya Beach",
-    beds: 4,
-    baths: 3,
-    area: 2200,
-    price: 45000,
-    type: "Villa",
-    image: "/images/rentals/rental2.jpg",
-  },
-  {
-    id: "11",
-    name: "Modern City Condo",
-    location: "Bangkok Central",
-    beds: 2,
-    baths: 1,
-    area: 850,
-    price: 15000,
-    type: "Condo",
-    image: "/images/rentals/rental3.jpg",
-  },
-  {
-    id: "12",
-    name: "Tropical Garden House",
-    location: "Chiang Mai",
-    beds: 3,
-    baths: 2,
-    area: 1800,
-    price: 20000,
-    type: "House",
-    image: "/images/rentals/rental4.jpg",
-  },
-  {
-    id: "13",
-    name: "Luxury Penthouse",
-    location: "Bangkok Central",
-    beds: 4,
-    baths: 3,
-    area: 3000,
-    price: 80000,
-    type: "Condo",
-    image: "/images/rentals/rental1.jpg",
-  },
-  {
-    id: "14",
-    name: "Riverside Retreat",
-    location: "Chiang Mai",
-    beds: 2,
-    baths: 2,
-    area: 1200,
-    price: 18000,
-    type: "House",
-    image: "/images/rentals/rental2.jpg",
-  },
-  {
-    id: "15",
-    name: "Beachfront Bungalow",
-    location: "Pattaya Beach",
-    beds: 1,
-    baths: 1,
-    area: 600,
-    price: 12000,
-    type: "Villa",
-    image: "/images/rentals/rental3.jpg",
-  },
-  {
-    id: "16",
-    name: "Mountain View Estate",
-    location: "Chiang Mai",
-    beds: 5,
-    baths: 4,
-    area: 3500,
-    price: 55000,
-    type: "Villa",
-    image: "/images/rentals/rental4.jpg",
-  },
-];
-
 const locations = ["All Locations", "Bangkok Central", "Pattaya Beach", "Chiang Mai", "Downtown Metropolis"];
 const propertyTypes = ["All Types", "House", "Condo", "Villa"];
 const bedroomOptions = ["Any Beds", "1+", "2+", "3+", "4+", "5+"];
 const priceRanges = ["Any Price", "Under ฿20,000", "฿20,000 - ฿40,000", "฿40,000 - ฿60,000", "Over ฿60,000"];
 
 export default function PropertiesPage() {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [location, setLocation] = useState("All Locations");
   const [propertyType, setPropertyType] = useState("All Types");
   const [bedrooms, setBedrooms] = useState("Any Beds");
   const [priceRange, setPriceRange] = useState("Any Price");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  const filteredRentals = rentals.filter((rental) => {
+  useEffect(() => {
+    async function fetchProperties() {
+      try {
+        const response = await fetch("/api/properties");
+        if (response.ok) {
+          const data = await response.json();
+          setProperties(data);
+        }
+      } catch (error) {
+        console.error("Error fetching properties:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchProperties();
+  }, []);
+
+  const filteredProperties = properties.filter((property) => {
     // Location filter
-    if (location !== "All Locations" && rental.location !== location) {
+    if (location !== "All Locations" && property.location !== location) {
       return false;
     }
 
     // Property type filter
-    if (propertyType !== "All Types" && rental.type !== propertyType) {
+    if (propertyType !== "All Types" && property.type !== propertyType) {
       return false;
     }
 
     // Bedrooms filter
     if (bedrooms !== "Any Beds") {
       const minBeds = parseInt(bedrooms);
-      if (rental.beds < minBeds) {
+      if (property.beds < minBeds) {
         return false;
       }
     }
 
     // Price range filter
     if (priceRange !== "Any Price") {
-      if (priceRange === "Under ฿20,000" && rental.price >= 20000) return false;
-      if (priceRange === "฿20,000 - ฿40,000" && (rental.price < 20000 || rental.price > 40000)) return false;
-      if (priceRange === "฿40,000 - ฿60,000" && (rental.price < 40000 || rental.price > 60000)) return false;
-      if (priceRange === "Over ฿60,000" && rental.price <= 60000) return false;
+      if (priceRange === "Under ฿20,000" && property.price >= 20000) return false;
+      if (priceRange === "฿20,000 - ฿40,000" && (property.price < 20000 || property.price > 40000)) return false;
+      if (priceRange === "฿40,000 - ฿60,000" && (property.price < 40000 || property.price > 60000)) return false;
+      if (priceRange === "Over ฿60,000" && property.price <= 60000) return false;
     }
 
     return true;
@@ -258,6 +99,14 @@ export default function PropertiesPage() {
     bedrooms !== "Any Beds",
     priceRange !== "Any Price",
   ].filter(Boolean).length;
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-6 md:px-0 py-16 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#122B45]" />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-6 md:px-0 py-8">
@@ -343,7 +192,7 @@ export default function PropertiesPage() {
 
         <p className="text-gray-500">Find your perfect rental property</p>
         <p className="text-gray-600 text-sm mt-1">
-          Showing <span className="font-semibold text-gray-900">{filteredRentals.length}</span> properties
+          Showing <span className="font-semibold text-gray-900">{filteredProperties.length}</span> properties
         </p>
       </div>
 
@@ -369,11 +218,11 @@ export default function PropertiesPage() {
         </div>
       </div>
 
-      {/* Rental Grid */}
-      {filteredRentals.length > 0 ? (
+      {/* Property Grid */}
+      {filteredProperties.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredRentals.map((rental) => (
-            <RentalCard key={rental.id} rental={rental} />
+          {filteredProperties.map((property) => (
+            <PropertyCard key={property.id} property={property} />
           ))}
         </div>
       ) : (
@@ -442,20 +291,20 @@ function FilterDropdown({ label, value, options, onChange }: FilterDropdownProps
   );
 }
 
-function RentalCard({ rental }: { rental: Rental }) {
+function PropertyCard({ property }: { property: Property }) {
   const { isInWishlist, toggleWishlist } = useWishlist();
-  const isWishlisted = isInWishlist(rental.id);
+  const isWishlisted = isInWishlist(property.id);
 
   return (
     <div className="group">
       {/* Image Container */}
       <Link
-        href={`/properties/${rental.id}`}
+        href={`/properties/${property.id}`}
         className="relative aspect-square mb-4 rounded-2xl overflow-hidden bg-linear-to-b from-sky-100 to-sky-50 block cursor-pointer"
       >
         <Image
-          src={rental.image}
-          alt={rental.name}
+          src={property.image}
+          alt={property.name}
           fill
           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
         />
@@ -463,7 +312,7 @@ function RentalCard({ rental }: { rental: Rental }) {
         {/* Property Type Badge */}
         <div className="absolute top-3 left-3">
           <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-medium text-gray-700">
-            {rental.type}
+            {property.type}
           </span>
         </div>
 
@@ -477,7 +326,7 @@ function RentalCard({ rental }: { rental: Rental }) {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              toggleWishlist(rental);
+              toggleWishlist(property);
             }}
             className={`p-2 rounded-full shadow-md transition-colors ${isWishlisted
               ? "bg-red-50 text-red-500"
@@ -502,16 +351,16 @@ function RentalCard({ rental }: { rental: Rental }) {
         {/* Price Badge */}
         <div className="absolute bottom-3 left-3">
           <span className="px-3 py-1.5 bg-[#122B45] text-white rounded-lg text-sm font-semibold">
-            ฿{rental.price.toLocaleString()}/mo
+            ฿{property.price.toLocaleString()}/mo
           </span>
         </div>
       </Link>
 
       {/* Content */}
-      <Link href={`/properties/${rental.id}`} className="block space-y-2">
+      <Link href={`/properties/${property.id}`} className="block space-y-2">
         {/* Title and View More */}
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900 truncate">{rental.name}</h3>
+          <h3 className="font-semibold text-gray-900 truncate">{property.name}</h3>
           <span className="text-sm text-blue-600 hover:text-blue-700 hover:underline shrink-0 ml-2">
             View More
           </span>
@@ -520,22 +369,22 @@ function RentalCard({ rental }: { rental: Rental }) {
         {/* Location */}
         <div className="flex items-center gap-1 text-gray-500 text-sm">
           <MapPin size={14} />
-          <span>{rental.location}</span>
+          <span>{property.location}</span>
         </div>
 
         {/* Stats */}
         <div className="flex items-center gap-4 text-gray-600 text-sm">
           <div className="flex items-center gap-1">
             <Bed size={16} />
-            <span>{rental.beds}</span>
+            <span>{property.beds}</span>
           </div>
           <div className="flex items-center gap-1">
             <Bath size={16} />
-            <span>{rental.baths}</span>
+            <span>{property.baths}</span>
           </div>
           <div className="flex items-center gap-1">
             <Maximize size={16} />
-            <span>{rental.area.toLocaleString()} ft²</span>
+            <span>{property.area.toLocaleString()} ft²</span>
           </div>
         </div>
       </Link>
