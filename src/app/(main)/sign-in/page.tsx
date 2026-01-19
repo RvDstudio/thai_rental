@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "@/lib/auth-client";
+import { signIn, authClient } from "@/lib/auth-client";
+import { Mail, Lock, Sparkles } from "lucide-react";
+
 // Google icon SVG component
 const GoogleIcon = ({ size = 20 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -26,16 +28,21 @@ const GoogleIcon = ({ size = 20 }: { size?: number }) => (
   </svg>
 );
 
+type SignInMethod = "password" | "magic-link";
+
 export default function SignInPage() {
   const router = useRouter();
+  const [signInMethod, setSignInMethod] = useState<SignInMethod>("password");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     setIsLoading(true);
 
     try {
@@ -57,8 +64,34 @@ export default function SignInPage() {
     }
   };
 
+  const handleMagicLinkSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    setIsLoading(true);
+
+    try {
+      const result = await authClient.signIn.magicLink({
+        email,
+        callbackURL: "/",
+      });
+
+      if (result.error) {
+        setError(result.error.message || "Failed to send magic link");
+      } else {
+        setSuccess("Check your email! We sent you a magic link to sign in.");
+        setEmail("");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleGoogleSignIn = async () => {
     setError(null);
+    setSuccess(null);
     setIsLoading(true);
 
     try {
@@ -73,7 +106,7 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center  px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 bg-[#F5F5F5] border border-gray-300 shadow-md p-8 rounded-lg">
         <div>
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-[#122B45]">
@@ -90,10 +123,58 @@ export default function SignInPage() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleEmailSignIn}>
+        {/* Sign In Method Tabs */}
+        <div className="flex rounded-lg bg-gray-200 p-1">
+          <button
+            type="button"
+            onClick={() => {
+              setSignInMethod("password");
+              setError(null);
+              setSuccess(null);
+            }}
+            className={`flex-1 flex items-center justify-center gap-2 rounded-md py-2 text-sm font-medium transition-colors ${
+              signInMethod === "password"
+                ? "bg-white text-[#122B45] shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            <Lock size={16} />
+            Password
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setSignInMethod("magic-link");
+              setError(null);
+              setSuccess(null);
+            }}
+            className={`flex-1 flex items-center justify-center gap-2 rounded-md py-2 text-sm font-medium transition-colors ${
+              signInMethod === "magic-link"
+                ? "bg-white text-[#122B45] shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            <Sparkles size={16} />
+            Magic Link
+          </button>
+        </div>
+
+        <form
+          className="mt-8 space-y-6"
+          onSubmit={signInMethod === "password" ? handleEmailSignIn : handleMagicLinkSignIn}
+        >
           {error && (
             <div className="rounded-md bg-red-50 p-4">
               <p className="text-sm text-red-800">{error}</p>
+            </div>
+          )}
+
+          {success && (
+            <div className="rounded-md bg-green-50 p-4 border border-green-200">
+              <div className="flex items-center gap-2">
+                <Mail size={18} className="text-green-600" />
+                <p className="text-sm text-green-800">{success}</p>
+              </div>
             </div>
           )}
 
@@ -115,31 +196,46 @@ export default function SignInPage() {
               />
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
-                placeholder="Enter your password"
-              />
-            </div>
+            {signInMethod === "password" && (
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                  placeholder="Enter your password"
+                />
+              </div>
+            )}
           </div>
+
+          {signInMethod === "magic-link" && (
+            <p className="text-sm text-gray-500 text-center">
+              We&apos;ll send you a magic link to sign in without a password.
+            </p>
+          )}
 
           <div>
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative flex w-full justify-center rounded-md border border-transparent bg-[#122B45] px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative flex w-full justify-center items-center gap-2 rounded-md border border-transparent bg-[#122B45] px-4 py-2 text-sm font-medium text-white hover:bg-[#1a3d5c] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              {signInMethod === "magic-link" && <Sparkles size={16} />}
+              {isLoading
+                ? signInMethod === "password"
+                  ? "Signing in..."
+                  : "Sending link..."
+                : signInMethod === "password"
+                  ? "Sign in"
+                  : "Send Magic Link"}
             </button>
           </div>
 
@@ -148,7 +244,7 @@ export default function SignInPage() {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="bg-gray-50 px-2 text-gray-500">Or continue with</span>
+              <span className="bg-[#F5F5F5] px-2 text-gray-500">Or continue with</span>
             </div>
           </div>
 
