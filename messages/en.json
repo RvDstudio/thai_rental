@@ -104,5 +104,11 @@
     "copyright": "All rights reserved",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service"
+  },
+  "recentProjects": {
+    "subtitle": "Best Projects of the Year",
+    "titlePart1": "Our Recent",
+    "titlePart2": "Projects",
+    "viewAll": "View all categories"
   }
 }

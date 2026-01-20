@@ -1,14 +1,18 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin, Bed, Bath, Maximize, Heart, ShoppingCart } from "lucide-react";
+import { MapPin, Bed, Bath, Maximize, Heart, ShoppingCart, Loader2 } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
 import { useWishlist } from "@/contexts/WishlistContext";
 
 interface Project {
   id: string;
   name: string;
+  nameTh: string | null;
   location: string;
+  locationTh: string | null;
   beds: number;
   baths: number;
   area: number;
@@ -17,73 +21,58 @@ interface Project {
   image: string;
 }
 
-interface RecentProjectsProps {
-  projects?: Project[];
-}
+export function RecentProjects() {
+  const t = useTranslations("recentProjects");
+  const tProps = useTranslations("properties");
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-const defaultProjects: Project[] = [
-  {
-    id: "1",
-    name: "Serene Haven Estates",
-    location: "Downtown Metropolis",
-    beds: 3,
-    baths: 2,
-    area: 1648,
-    price: 25000,
-    type: "House",
-    image: "/images/rentals/rental1.jpg",
-  },
-  {
-    id: "2",
-    name: "Ocean View Villa",
-    location: "Pattaya Beach",
-    beds: 4,
-    baths: 3,
-    area: 2200,
-    price: 45000,
-    type: "Villa",
-    image: "/images/rentals/rental2.jpg",
-  },
-  {
-    id: "3",
-    name: "Modern City Condo",
-    location: "Bangkok Central",
-    beds: 2,
-    baths: 1,
-    area: 850,
-    price: 15000,
-    type: "Condo",
-    image: "/images/rentals/rental3.jpg",
-  },
-  {
-    id: "4",
-    name: "Tropical Garden House",
-    location: "Chiang Mai",
-    beds: 3,
-    baths: 2,
-    area: 1800,
-    price: 20000,
-    type: "House",
-    image: "/images/rentals/rental4.jpg",
-  },
-];
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const response = await fetch("/api/properties", {
+          cache: "no-store",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          // Only show first 4 projects
+          setProjects(data.slice(0, 4));
+        }
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
 
-export function RecentProjects({ projects = defaultProjects }: RecentProjectsProps) {
+    fetchProjects();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <section className="py-16 pt-4">
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-[#122B45]" />
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-16 pt-4">
       {/* Header */}
       <div className="flex items-end justify-between mb-10">
         <div>
           <p className="text-xs uppercase tracking-widest text-gray-500 mb-2">
-            Best Projects of the Year
+            {t("subtitle")}
           </p>
-          <h2 className="text-3xl text-[#122B45]">Our Recent <span className="text-[#9FC3E9]">Projects</span></h2>
+          <h2 className="text-3xl text-[#122B45]">{t("titlePart1")} <span className="text-[#9FC3E9]">{t("titlePart2")}</span></h2>
         </div>
         <Link
           href="/properties"
           className="px-6 py-3 bg-[#122B45] text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors"
         >
-          View all categories
+          {t("viewAll")}
         </Link>
       </div>
 
@@ -98,8 +87,14 @@ export function RecentProjects({ projects = defaultProjects }: RecentProjectsPro
 }
 
 function ProjectCard({ project }: { project: Project }) {
+  const t = useTranslations("properties");
+  const locale = useLocale();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const isWishlisted = isInWishlist(project.id);
+
+  // Get localized name and location
+  const displayName = locale === "th" && project.nameTh ? project.nameTh : project.name;
+  const displayLocation = locale === "th" && project.locationTh ? project.locationTh : project.location;
 
   return (
     <div className="group">
@@ -110,7 +105,7 @@ function ProjectCard({ project }: { project: Project }) {
       >
         <Image
           src={project.image}
-          alt={project.name}
+          alt={displayName}
           fill
           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
         />
@@ -154,16 +149,16 @@ function ProjectCard({ project }: { project: Project }) {
       <Link href={`/properties/${project.id}`} className="block space-y-2">
         {/* Title and View More */}
         <div className="flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900">{project.name}</h3>
+          <h3 className="font-semibold text-gray-900">{displayName}</h3>
           <span className="text-sm text-blue-600 hover:text-blue-700 hover:underline">
-            View More
+            {t("viewMore")}
           </span>
         </div>
 
         {/* Location */}
         <div className="flex items-center gap-1 text-gray-500 text-sm">
           <MapPin size={14} />
-          <span>{project.location}</span>
+          <span>{displayLocation}</span>
         </div>
 
         {/* Stats */}
@@ -178,7 +173,7 @@ function ProjectCard({ project }: { project: Project }) {
           </div>
           <div className="flex items-center gap-1">
             <Maximize size={16} />
-            <span>{project.area.toLocaleString()} ft²</span>
+            <span>{project.area.toLocaleString()} {t("area")}</span>
           </div>
         </div>
       </Link>

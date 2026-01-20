@@ -51,7 +51,9 @@ export default function PropertiesPage() {
   useEffect(() => {
     async function fetchProperties() {
       try {
-        const response = await fetch("/api/properties");
+        const response = await fetch("/api/properties", {
+          cache: "no-store",
+        });
         if (response.ok) {
           const data = await response.json();
           setProperties(data);
@@ -272,7 +274,7 @@ export default function PropertiesPage() {
       {filteredProperties.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredProperties.map((property) => (
-            <PropertyCard key={property.id} property={property} t={t} tTypes={tTypes} locale={locale} />
+            <PropertyCard key={property.id} property={property} />
           ))}
         </div>
       ) : (
@@ -344,12 +346,12 @@ function FilterDropdown({ label, value, options, rawValues, onChange }: FilterDr
 
 interface PropertyCardProps {
   property: Property;
-  t: ReturnType<typeof useTranslations<"properties">>;
-  tTypes: ReturnType<typeof useTranslations<"propertyTypes">>;
-  locale: string;
 }
 
-function PropertyCard({ property, t, tTypes, locale }: PropertyCardProps) {
+function PropertyCard({ property }: PropertyCardProps) {
+  const t = useTranslations("properties");
+  const tTypes = useTranslations("propertyTypes");
+  const locale = useLocale();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const isWishlisted = isInWishlist(property.id);
 

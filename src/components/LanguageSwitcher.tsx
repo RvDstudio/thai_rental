@@ -26,12 +26,14 @@ export function LanguageSwitcher() {
   const currentLanguage = languages.find((lang) => lang.code === locale);
 
   const handleLanguageChange = (newLocale: string) => {
+    if (newLocale === locale) return;
+
     // Set cookie to persist the language preference
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
 
-    startTransition(() => {
-      router.refresh();
-    });
+    // Force a hard reload to ensure the new locale is picked up
+    // router.refresh() doesn't work reliably with cookie-based locales
+    window.location.reload();
   };
 
   return (
