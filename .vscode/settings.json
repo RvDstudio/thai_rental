@@ -8,5 +8,6 @@
         "Sukhumvit",
         "Suthep",
         "Wishlisted"
-    ]
+    ],
+    "postman.settings.dotenv-detection-notification-visibility": false
 }
