@@ -108,8 +108,7 @@ export default function AccountPage() {
   };
 
   const handleSaveEdit = async () => {
-    // In a real app, this would call an API to update user details
-    console.log("Saving user details:", editForm);
+    // TODO: Call API to update user details
     setIsEditing(false);
   };
 

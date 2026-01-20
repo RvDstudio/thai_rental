@@ -4,6 +4,33 @@ import { property } from "@/db/schema";
 import { requireAdmin } from "@/lib/auth-server";
 import crypto from "crypto";
 
+const ALLOWED_IMAGE_DOMAINS = [
+  "images.unsplash.com",
+  "lh3.googleusercontent.com",
+];
+
+function isValidImageUrl(url: string): boolean {
+  // Allow local paths
+  if (url.startsWith("/")) {
+    // Prevent path traversal
+    if (url.includes("..") || url.includes("//")) {
+      return false;
+    }
+    return true;
+  }
+
+  // Validate external URLs
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:") {
+      return false;
+    }
+    return ALLOWED_IMAGE_DOMAINS.includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(request: Request) {
   const authResult = await requireAdmin();
 
@@ -13,6 +40,16 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
+
+    const defaultImage = "/images/rentals/rental1.jpg";
+    const image = body.image && isValidImageUrl(body.image) ? body.image : defaultImage;
+    const images = Array.isArray(body.images)
+      ? body.images.filter(isValidImageUrl)
+      : [defaultImage];
+
+    if (images.length === 0) {
+      images.push(defaultImage);
+    }
 
     const newProperty = {
       id: crypto.randomUUID(),
@@ -24,8 +61,8 @@ export async function POST(request: Request) {
       area: parseInt(body.area),
       price: parseInt(body.price),
       type: body.type,
-      image: body.image || "/images/rentals/rental1.jpg",
-      images: body.images || ["/images/rentals/rental1.jpg"],
+      image,
+      images,
       description: body.description || null,
       amenities: body.amenities || [],
       isAvailable: body.isAvailable ?? true,
