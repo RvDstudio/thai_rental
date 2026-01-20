@@ -9,7 +9,9 @@ export async function GET() {
       .select({
         id: property.id,
         name: property.name,
+        nameTh: property.nameTh,
         location: property.location,
+        locationTh: property.locationTh,
         beds: property.beds,
         baths: property.baths,
         area: property.area,

@@ -19,27 +19,58 @@
     "subtitle": "Discover beautiful properties across Thailand for your dream vacation or long-term stay"
   },
   "properties": {
+    "available": "Available",
     "title": "Properties",
     "allProperties": "All Properties",
+    "subtitle": "Find your perfect rental property",
+    "showing": "Showing",
+    "propertiesCount": "properties",
     "featured": "Featured",
-    "perMonth": "per month",
+    "perMonth": "/mo",
     "perNight": "per night",
     "bedrooms": "Bedrooms",
     "bathrooms": "Bathrooms",
+    "area": "ft²",
     "viewDetails": "View Details",
+    "viewMore": "View More",
     "filters": "Filters",
+    "clearAll": "Clear all",
     "priceRange": "Price Range",
     "propertyType": "Property Type",
     "location": "Location",
     "minPrice": "Min Price",
     "maxPrice": "Max Price",
     "applyFilters": "Apply Filters",
-    "clearFilters": "Clear Filters",
-    "noResults": "No properties found matching your criteria",
+    "clearFilters": "Clear filters",
+    "noResults": "No properties found matching your filters.",
     "sortBy": "Sort by",
     "newest": "Newest",
     "priceLowHigh": "Price: Low to High",
-    "priceHighLow": "Price: High to Low"
+    "priceHighLow": "Price: High to Low",
+    "allLocations": "All Locations",
+    "allTypes": "All Types",
+    "anyBeds": "Any Beds",
+    "anyPrice": "Any Price",
+    "under": "Under",
+    "over": "Over"
+  },
+  "locations": {
+    "bangkokCentral": "Bangkok Central",
+    "pattayaBeach": "Pattaya Beach",
+    "chiangMai": "Chiang Mai",
+    "downtownMetropolis": "Downtown Metropolis"
+  },
+  "ads": {
+    "dreamHome": {
+      "title": "Find Your Dream Home",
+      "description": "Explore our exclusive listings with premium amenities and prime locations.",
+      "button": "Learn More"
+    },
+    "specialOffers": {
+      "title": "Special Offers Available",
+      "description": "Get up to 20% off on your first month rent. Limited time offer!",
+      "button": "View Deals"
+    }
   },
   "propertyTypes": {
     "house": "House",

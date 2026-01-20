@@ -58,7 +58,9 @@ export const verification = pgTable("verification", {
 export const property = pgTable("property", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
+  nameTh: text("nameTh"), // Thai translation of name
   location: text("location").notNull(),
+  locationTh: text("locationTh"), // Thai translation of location
   address: text("address").notNull(),
   beds: integer("beds").notNull(),
   baths: integer("baths").notNull(),
