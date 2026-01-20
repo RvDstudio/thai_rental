@@ -155,7 +155,7 @@ export default function SearchPage() {
   return (
     <div className="h-[calc(100vh-80px)] flex flex-col">
       {/* Search Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-200 px-6 py-4 relative z-[1000]">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">
